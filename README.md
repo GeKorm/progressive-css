@@ -68,7 +68,7 @@ During development it will point to /styles/Awesome.css instead.
 A path can contain a glob but must be dot-delimited.
 
 `withCSS(__CSS__, firefox: boolean = true)(Component);`
-If `firefox` is false, then it won't inject empty script tags to work around Firefox
+If `firefox` is false, then it won't inject empty script tags to work around Firefox Flash Of Unstyled Content
 
 **Webpack:**
 Should be the last loader. The css is resolved relative to webpack's `module.output.path` unless `options` is defined
