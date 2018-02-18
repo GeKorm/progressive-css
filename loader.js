@@ -3,7 +3,7 @@ const filehound = require('filehound');
 const evaluate = require('node-eval');
 const loaderUtils = require('loader-utils');
 
-const isProd = true || process.env.NODE_ENV === 'production';
+const isProd = process.env.NODE_ENV === 'production';
 const hound = isProd && filehound.create();
 
 const pathMatcher = /(.*\/|.*\\)?([^\/\\]+)/;
