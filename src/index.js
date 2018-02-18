@@ -15,16 +15,16 @@ const script = <script dangerouslySetInnerHTML={{__html: ' '}} />;
 const withCSS = (paths, firefox = true) => (BaseComponent) => {
   let hrefs = paths;
 
-  if (!global.CSS_CHUNKS_LOADED) {
+  if (!global.__CSS_CHUNKS_LOADED__) {
     // Dedupe stylesheets
-    global.CSS_CHUNKS_LOADED = {};
+    global.__CSS_CHUNKS_LOADED__ = [];
   }
 
-  if (global.CSS_CHUNKS_LOADED.length < 1) {
-    global.CSS_CHUNKS_LOADED = [...hrefs];
+  if (global.__CSS_CHUNKS_LOADED__.length < 1) {
+    global.__CSS_CHUNKS_LOADED__ = [...hrefs];
   } else {
-    hrefs = hrefs.filter((path) => !global.CSS_CHUNKS_LOADED.includes(path));
-    global.CSS_CHUNKS_LOADED.push(...hrefs);
+    hrefs = hrefs.filter((path) => !global.__CSS_CHUNKS_LOADED__.includes(path));
+    if (hrefs.length > 0) global.__CSS_CHUNKS_LOADED__.push(...hrefs);
   }
 
   return (props) => (
