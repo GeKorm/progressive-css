@@ -34,7 +34,6 @@ module.exports = function withCSS(source) {
       }
       if (isProd && href.includes('*')) {
         const stylePath = new StylePath(href);
-        console.log(stylePath.filename);
         stylePath.filename = hound
           .path(path.join(options.root || this.options.output.path, stylePath.directory))
           .glob(stylePath.filename)
