@@ -1,5 +1,6 @@
 const React = require('react');
 
+const isProd = process.env.NODE_ENV == 'production';
 // Prevent unstyled flash in Firefox
 const script = <script dangerouslySetInnerHTML={{__html: ' '}} />;
 
@@ -30,7 +31,7 @@ const withCSS = (paths, firefox = true) => (BaseComponent) => {
   return (props) => (
     <React.Fragment>
       {hrefs.map((href) => <link rel="stylesheet" href={href} key={href} />)}
-      {firefox ? script : null}
+      {firefox && isProd ? script : null}
       <BaseComponent {...props} />
     </React.Fragment>
   );
