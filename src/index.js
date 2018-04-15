@@ -6,14 +6,18 @@ const script = <script dangerouslySetInnerHTML={{__html: ' '}} />;
 let loadedChunks;
 
 const pathNotLoaded = (path) => {
-  const exists = loadedChunks.has(path);
+  const exists = loadedChunks[path] && loadedChunks[path] > 0;
   if (!exists) {
     // Look to refactor this side effect out of here
-    loadedChunks.add(path);
+    loadedChunks[path] = loadedChunks[path] ? loadedChunks[path] + 1 : 1;
   }
-
   return !exists;
 };
+
+function getDisplayName(WrappedComponent) {
+  const name = WrappedComponent.displayName || WrappedComponent.name || 'Component';
+  return name.startsWith('_') ? name.slice(1) : name;
+}
 
 /**
  * Enhancer that places <link ref="stylesheet" ...> before your component
@@ -26,15 +30,21 @@ const pathNotLoaded = (path) => {
  */
 const withCSS = (paths, firefox = true) => (BaseComponent) =>
   class CSS extends React.Component {
+    static displayName = `withCSS(${getDisplayName(BaseComponent)})`;
+
     constructor(props) {
       super(props);
       let hrefs = paths;
-      if (!isProd && module.hot && loadedChunks && loadedChunks.size > paths.length) {
-        loadedChunks.clear();
+      const loadedChunksSize = loadedChunks && Object.keys(loadedChunks).length;
+      if (!isProd && module.hot && loadedChunksSize > 0) {
+        loadedChunks = {};
       }
 
-      if (!loadedChunks || loadedChunks.size < 1) {
-        loadedChunks = new Set(hrefs);
+      if (!loadedChunks || loadedChunksSize < 1) {
+        loadedChunks = [...new Set(hrefs)].reduce((acc, cur) => {
+          acc[cur] = 1;
+          return acc;
+        }, {});
       } else {
         hrefs = hrefs.filter(pathNotLoaded);
       }
@@ -45,7 +55,7 @@ const withCSS = (paths, firefox = true) => (BaseComponent) =>
       if (!isProd && module.hot) {
         return;
       }
-      this.state.hrefs.forEach((path) => loadedChunks.delete(path));
+      paths.forEach((path) => loadedChunks[path]--);
     }
 
     render() {
