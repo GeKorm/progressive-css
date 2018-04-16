@@ -26,7 +26,7 @@ module.exports = {
       amd: 'react-dom',
     },
   },
-  plugins: [new CleanWebpackPlugin(['lib'], { verbose: false })],
+  plugins: [new CleanWebpackPlugin(['lib'], { verbose: false }), new UglifyJSPlugin()],
   module: {
     rules: [
       {

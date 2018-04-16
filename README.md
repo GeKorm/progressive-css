@@ -31,23 +31,14 @@ class Awesome extends Component {
 export default withCSS(__CSS__)(Awesome);
 ```
 
-Add the loader in your webpack config
+Add the babel plugin
 
-###### webpack.config.js
-```javascript
-const config = {
-  module: {
-    rules: [
-      ...,
-      { // Should be the last loader
-        test: /\.(js|jsx|ts|tsx)$/,
-        use: [{ loader: 'progressive-css/loader' }]
-      }
-    ]
-  }
-};
-
-module.exports = config;
+###### .babelrc
+```json
+"plugins": [
+  // ... other plugins ...,
+  ["progressive-css/babel-plugin", { root: "./" }]
+]
 ```
 
 ###### Output (production):
@@ -55,7 +46,7 @@ module.exports = config;
 <link rel="stylesheet" href="/styles/normalize.css" />
 <link rel="stylesheet" href="/styles/Awesome.h4sh3d.min.css" />
 <script> </script>
-<div className="hello">Hello World</div>
+<div class="hello">Hello World</div>
 ```
 
 During development it will point to /styles/Awesome.css instead.
@@ -64,26 +55,14 @@ During development it will point to /styles/Awesome.css instead.
 
 **React:**
 `const __CSS__ = string[]` Paths to stylesheets, resolved as `<link href="path" />`
-**MUST** be named `__CSS__` if using the webpack loader, with a static value (not imported).
+**MUST** be named `__CSS__` if using the babel plugin, with a static value (not imported).
 A path can contain a glob but must be dot-delimited.
 
-`withCSS(__CSS__, firefox: boolean = true)(Component);`
-If `firefox` is false, then it won't inject empty script tags to work around Firefox Flash Of Unstyled Content
+`withCSS(__CSS__, scriptBlock: boolean = true)(Component);`
+If `scriptBlock` is false, then it won't inject empty script tags to work around Firefox Flash Of Unstyled Content
 
-**Webpack:**
-Should be the last loader. The css is resolved relative to webpack's `module.output.path` unless `options` is defined
-```javascript
-const config = {
-  module: {
-    rules: [{
-      test: /\.(js|jsx|ts|tsx)$/,
-      use: [{
-        loader: 'progressive-css/loader',
-        options: { // OPTIONAL
-          root: path.resolve(__dirname, './my/custom/root')
-        }
-      }]
-    }]
-  }
-};
-```
+**Babel:**
+Should be the last plugin. The css is resolved relative to `./` unless the `root` option specifies otherwise
+
+### SSR
+Server-side rendering works out of the box using the provided babel plugin.

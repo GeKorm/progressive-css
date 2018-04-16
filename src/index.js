@@ -25,10 +25,10 @@ function getDisplayName(WrappedComponent) {
  * @param paths {string[]} - Paths to css files relative to root. Supports
  * dot (.) delimited globs, eg: `['/css/AwesomeComponent.*.css']` will reference
  * `AwesomeComponent.css` during development and `AwesomeComponent.hash.css` if it exists in production
- * @param [firefox=true] {boolean} - Inject empty script tags to prevent unstyled content flash in Firefox
+ * @param [scriptBlock=true] {boolean} - Inject empty script tags to prevent unstyled content flash in Firefox
  * @returns {function(*): function(ReactElement): *}
  */
-const withCSS = (paths, firefox = true) => (BaseComponent) =>
+const withCSS = (paths, scriptBlock = true) => (BaseComponent) =>
   class CSS extends React.Component {
     static displayName = `withCSS(${getDisplayName(BaseComponent)})`;
 
@@ -62,7 +62,7 @@ const withCSS = (paths, firefox = true) => (BaseComponent) =>
       return (
         <>
           {this.state.hrefs.map((href) => <link rel="stylesheet" href={href} key={href} />)}
-          {firefox && isProd ? script : null}
+          {scriptBlock && isProd ? script : null}
           <BaseComponent {...this.props} />
         </>
       );
