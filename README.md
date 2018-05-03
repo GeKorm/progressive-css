@@ -34,9 +34,9 @@ export default withCSS(__CSS__)(Awesome);
 Add the babel plugin
 
 ###### .babelrc
-```json
+```
 "plugins": [
-  // ... other plugins ...,
+  // ... other plugins,
   ["progressive-css/babel-plugin", { root: "./" }]
 ]
 ```

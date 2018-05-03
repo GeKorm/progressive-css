@@ -1,4 +1,5 @@
 const React = require('react');
+const hoistStatics  = require('hoist-non-react-statics');
 
 const isProd = process.env.NODE_ENV == 'production';
 // Prevent unstyled flash in Firefox
@@ -28,7 +29,7 @@ function getDisplayName(WrappedComponent) {
  * @param [scriptBlock=true] {boolean} - Inject empty script tags to prevent unstyled content flash in Firefox
  * @returns {function(*): function(ReactElement): *}
  */
-const withCSS = (paths, scriptBlock = true) => (BaseComponent) =>
+const withCSS = (paths, scriptBlock = true) => (BaseComponent) => {
   class CSS extends React.Component {
     static displayName = `withCSS(${getDisplayName(BaseComponent)})`;
 
@@ -67,6 +68,9 @@ const withCSS = (paths, scriptBlock = true) => (BaseComponent) =>
         </>
       );
     }
-  };
+  }
+
+  return hoistStatics(CSS, BaseComponent);
+};
 
 module.exports = withCSS;
