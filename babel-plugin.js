@@ -15,13 +15,15 @@ class StylePath {
 
 module.exports = function(babel) {
   const { types: t } = babel;
-  const isProd = process.env.NODE_ENV === 'production';
-  const hound = isProd && filehound.create();
+
   return {
     name: 'progressive-css', // not required
     visitor: {
       VariableDeclarator(path, state) {
         const options = state.opts;
+        const isProd = state.opts.isProd;
+        const hound = isProd && filehound.create();
+
         if (path.node.id.name === '__CSS__') {
           const hrefs = path.node.init.elements;
           hrefs.forEach((element) => {

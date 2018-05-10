@@ -37,7 +37,7 @@ Add the babel plugin
 ```
 "plugins": [
   // ... other plugins,
-  ["progressive-css/babel-plugin", { root: "./" }]
+  ["progressive-css/babel-plugin", { root: "./", isProd: process.env.NODE_ENV === 'production' }]
 ]
 ```
 
@@ -62,7 +62,8 @@ A path can contain a glob but must be dot-delimited.
 If `scriptBlock` is false, then it won't inject empty script tags to work around Firefox Flash Of Unstyled Content
 
 **Babel:**
-Should be the last plugin. The css is resolved relative to `./` unless the `root` option specifies otherwise
+Should be the last plugin. The css is resolved relative to `./` unless the `root` option specifies otherwise.
+**In production** you must specify `isProd: true`.
 
 ### SSR
 Server-side rendering works out of the box using the provided babel plugin.
