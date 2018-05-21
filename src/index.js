@@ -3,17 +3,8 @@ const hoistStatics  = require('hoist-non-react-statics');
 
 const isProd = process.env.NODE_ENV == 'production';
 // Prevent unstyled flash in Firefox
-const script = <script dangerouslySetInnerHTML={{__html: ' '}} />;
-let loadedChunks;
-
-const pathNotLoaded = (path) => {
-  const exists = loadedChunks[path] && loadedChunks[path] > 0;
-  if (!exists) {
-    // Look to refactor this side effect out of here
-    loadedChunks[path] = loadedChunks[path] ? loadedChunks[path] + 1 : 1;
-  }
-  return !exists;
-};
+const script = <script dangerouslySetInnerHTML={{ __html: ' ' }} />;
+const loadedChunks = new Set();
 
 function getDisplayName(WrappedComponent) {
   const name = WrappedComponent.displayName || WrappedComponent.name || 'Component';
@@ -35,28 +26,17 @@ const withCSS = (paths, scriptBlock = true) => (BaseComponent) => {
 
     constructor(props) {
       super(props);
-      let hrefs = paths;
-      const loadedChunksSize = loadedChunks && Object.keys(loadedChunks).length;
-      if (!isProd && module.hot && loadedChunksSize > 0) {
-        loadedChunks = {};
-      }
+      const hrefs = [...new Set(paths)].filter((path) => {
+        const hasPath = loadedChunks.has(path);
+        if (!hasPath) loadedChunks.add(path);
 
-      if (!loadedChunks || loadedChunksSize < 1) {
-        loadedChunks = [...new Set(hrefs)].reduce((acc, cur) => {
-          acc[cur] = 1;
-          return acc;
-        }, {});
-      } else {
-        hrefs = hrefs.filter(pathNotLoaded);
-      }
+        return !hasPath;
+      });
       this.state = { hrefs };
     }
 
     componentWillUnmount() {
-      if (!isProd && module.hot) {
-        return;
-      }
-      paths.forEach((path) => loadedChunks[path]--);
+      this.state.hrefs.forEach((path) => loadedChunks.delete(path));
     }
 
     render() {
