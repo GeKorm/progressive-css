@@ -42,7 +42,9 @@ const withCSS = (paths, scriptBlock = true) => (BaseComponent) => {
     render() {
       return (
         <>
-          {this.state.hrefs.map((href) => <link rel="stylesheet" href={href} key={href} />)}
+          {this.state.hrefs.map((href) => (
+            <link rel="stylesheet" type="text/css" href={href} key={href} />
+          ))}
           {scriptBlock && isProd ? script : null}
           <BaseComponent {...this.props} />
         </>
