@@ -53,7 +53,7 @@ During development it will point to /styles/Awesome.css instead.
 
 ### API
 
-**React:**
+#### React
 `const __CSS__ = string[]` Paths to stylesheets, resolved as `<link href="path" />`
 **MUST** be named `__CSS__` if using the babel plugin, with a static value (not imported).
 A path can contain a glob but must be dot-delimited.
@@ -61,9 +61,25 @@ A path can contain a glob but must be dot-delimited.
 `withCSS(__CSS__, scriptBlock: boolean = true)(Component);`
 If `scriptBlock` is false, then it won't inject empty script tags to work around Firefox Flash Of Unstyled Content
 
-**Babel:**
+#### Babel
+```javascript
+const defaultOptions = {
+  root: './', // All CSS paths are resolved relative to this
+  isProd: false, // Enable to turn on file discovery and glob matching
+  replaceDir: undefined // [regexp|substr, newSubstr|function] Applies string.replace() to the directories
+}
+```
+
 Should be the last plugin. The css is resolved relative to `./` unless the `root` option specifies otherwise.
-**In production** you must specify `isProd: true`.
+**In production** you must specify `isProd: true`.  
+`replaceDir` is useful for separating your production CSS files. For example:
+
+
+`replaceDir: ['/styles/', '/dist/']` turns  
+`['/styles/normalize.css', '/styles/Awesome.*.*.css'];`  
+into  
+`['/dist/normalize.css', '/dist/Awesome.*.*.css'];`
+
 
 ### SSR
 Server-side rendering works out of the box using the provided babel plugin.

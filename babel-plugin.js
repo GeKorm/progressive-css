@@ -1,11 +1,14 @@
 const nodePath  = require('path');
 const filehound = require('filehound');
 
-const pathMatcher = /(.*\/|.*\\)?([^\/\\]+)/;
+// const pathMatcher = /(.*\/|.*\\)?([^\/\\]+)/;
+const applyReplace = (text, args) => args ? text.replace(...args) : text;
 
 class StylePath {
-  constructor(path) {
-    [this.directory, this.filename] = path.match(pathMatcher).slice(1);
+  constructor(path, replaceDir) {
+    this.filename = nodePath.basename(path);
+    this.directory = path.replace(this.filename, '');
+    if (replaceDir) this.directory = applyReplace(this.directory, replaceDir);
   }
 
   get path() {
@@ -21,25 +24,26 @@ module.exports = function(babel) {
     visitor: {
       VariableDeclarator(path, state) {
         const options = state.opts;
-        const isProd = state.opts.isProd;
-        const hound = isProd && filehound.create();
+        const { isProd, replaceDir, root } = options;
 
         if (path.node.id.name === '__CSS__') {
           const hrefs = path.node.init.elements;
           hrefs.forEach((element) => {
             let href = element.value;
+            const stylePath = new StylePath(href, replaceDir);
             if (!isProd) {
               element.value = href.replace(/\*\./g, '');
               return;
             }
             if (isProd && href.includes('*')) {
-              const stylePath = new StylePath(href);
+              const hound = isProd && filehound.create();
+
               const found = hound
-                .path(nodePath.join(options.root || './', stylePath.directory))
+                .path(nodePath.join(root || './', stylePath.directory))
                 .glob(stylePath.filename)
                 .ignoreHiddenFiles()
                 .findSync()[0];
-              stylePath.filename = found && found.match(pathMatcher)[2];
+              stylePath.filename = found && nodePath.basename(found);
 
               // return stylePath.path;
               element.value = stylePath.path;
