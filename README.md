@@ -9,13 +9,15 @@ Notice how reloading is instant.
 
 ### Install
 
-- Yarn: `yarn add progressive-css`
-- Npm: `npm i progressive-css`
+- Yarn: `yarn add progressive-css; yarn add -D filehound`
+- Npm: `npm i -S progressive-css; npm i -D filehound`
+
+(filehound is a peer dependency)
 
 ### Example usage:
 
 ###### Awesome.js
-```jsx harmony
+```jsx
 import React, { Component } from 'react';
 import withCSS from 'progressive-css';
 
@@ -101,10 +103,10 @@ for things like preloading.
 
 ###### Example: preload the first 3 css chunks
 ```jsx
-   const toRender = renderToString(<App />);
-   const cssChunks = flushCSS();
-   
-   const result = `
+const toRender = renderToString(<App />);
+const cssChunks = flushCSS();
+
+const result = `
 <!DOCTYPE html>
 <html lang="en">
   <head>
