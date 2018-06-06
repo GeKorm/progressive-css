@@ -62,5 +62,9 @@ const withCSS = (paths, scriptBlock = true) => (BaseComponent) => {
   return hoistStatics(CSS, BaseComponent);
 };
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 exports.flushCSS = flushCSS;
 exports.default = withCSS;
