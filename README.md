@@ -61,6 +61,71 @@ A path can contain a glob but must be dot-delimited.
 `withCSS(__CSS__, scriptBlock: boolean = true)(Component);`
 If `scriptBlock` is false, then it won't inject empty script tags to work around Firefox Flash Of Unstyled Content
 
+##### Server-side rendering
+**flushCSS()**  
+
+If you perform server-side rendering you must let progressive-css know when to flush its CSS chunks. This is usually every
+time you call the reactDomServer methods (eg renderToString())
+
+Example
+```jsx
+// server-render.js
+
+import React from 'react';
+import { renderToString } from 'react-dom/server';
+import { flushCSS } from 'progressive-css'
+
+const getPage = (req, res) => {
+   const toRender = renderToString(<App />);
+   flushCSS();
+   
+   const result = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charSet="utf-8">
+    <title>Example</title>
+  </head>
+  <body>
+    <div id="root">${toRender}</div>
+  </body>
+</html>
+`;
+
+   res.status(200).send(result);
+}
+```
+
+**flushCSS()** returns an array of the loaded CSS paths that were cleared, which you can optionally be used
+for things like preloading.
+
+###### Example: preload the first 3 css chunks
+```jsx
+   const toRender = renderToString(<App />);
+   const cssChunks = flushCSS();
+   
+   const result = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charSet="utf-8">
+    <title>Example</title>
+    ${
+      cssChunks && cssChunks[0]
+        ? cssChunks
+            .slice(0, 3)
+            .map((href) => `<link rel="preload" href="${href}" as="style">`)
+            .join('\n')
+        : ''
+    }
+  </head>
+  <body>
+    <div id="root">${toRender}</div>
+  </body>
+</html>
+`;
+```
+
 #### Babel
 ```javascript
 const defaultOptions = {

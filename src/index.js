@@ -11,6 +11,13 @@ function getDisplayName(WrappedComponent) {
   return name.startsWith('_') ? name.slice(1) : name;
 }
 
+function flushCSS() {
+  const currentChunks = [...loadedChunks];
+  loadedChunks.clear();
+
+  return currentChunks;
+}
+
 /**
  * Enhancer that places <link ref="stylesheet" ...> before your component
  *
@@ -55,4 +62,5 @@ const withCSS = (paths, scriptBlock = true) => (BaseComponent) => {
   return hoistStatics(CSS, BaseComponent);
 };
 
-module.exports = withCSS;
+exports.flushCSS = flushCSS;
+exports.default = withCSS;
