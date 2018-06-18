@@ -98,7 +98,7 @@ const getPage = (req, res) => {
 }
 ```
 
-**flushCSS()** returns an array of the loaded CSS paths **that were cleared**, which you can optionally be used
+**flushCSS()** returns an array of the loaded CSS paths **that were cleared**, which can optionally be used
 for things like preloading.
 
 **getCSS()** returns an array of the currently loaded CSS paths **without clearing them** 
