@@ -1,10 +1,10 @@
 const React = require('react');
-const hoistStatics  = require('hoist-non-react-statics');
+const hoistStatics = require('hoist-non-react-statics');
 
 const isProd = process.env.NODE_ENV == 'production';
 // Prevent unstyled flash in Firefox
 const script = <script dangerouslySetInnerHTML={{ __html: ' ' }} />;
-const loadedChunks = new Set();
+const chunkMap = new Map();
 
 function getDisplayName(WrappedComponent) {
   const name = WrappedComponent.displayName || WrappedComponent.name || 'Component';
@@ -12,10 +12,14 @@ function getDisplayName(WrappedComponent) {
 }
 
 function flushCSS() {
-  const currentChunks = [...loadedChunks];
-  loadedChunks.clear();
+  const currentChunks = [...chunkMap.keys()];
+  chunkMap.clear();
 
   return currentChunks;
+}
+
+function getCSS() {
+  return [...chunkMap.keys()];
 }
 
 /**
@@ -31,20 +35,34 @@ const withCSS = (paths, scriptBlock = true) => (BaseComponent) => {
   class CSS extends React.Component {
     static displayName = `withCSS(${getDisplayName(BaseComponent)})`;
 
-    constructor(props) {
-      super(props);
-      const hrefs = [...new Set(paths)].filter((path) => {
-        const hasPath = loadedChunks.has(path);
-        if (!hasPath) loadedChunks.add(path);
+    constructor(props, context) {
+      super(props, context);
+      const hrefs = paths.filter((path) => {
+        const subscribers = chunkMap.get(path);
+        if (subscribers) {
+          subscribers.push(this);
+        } else {
+          chunkMap.set(path, [this]);
+        }
 
-        return !hasPath;
+        return !subscribers;
       });
       this.state = { hrefs };
     }
 
     componentWillUnmount() {
-      this.state.hrefs.forEach((path) => loadedChunks.delete(path));
+      paths.forEach((path) => {
+        const subscribers = chunkMap.get(path);
+        subscribers.shift();
+        if (subscribers.length <= 0) {
+          chunkMap.delete(path);
+        } else {
+          subscribers[0].add(path);
+        }
+      });
     }
+
+    add = (path) => this.setState(({ hrefs }) => ({ hrefs: [...hrefs, path] }));
 
     render() {
       return (
@@ -67,4 +85,5 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports.flushCSS = flushCSS;
+exports.getCSS = getCSS;
 exports.default = withCSS;
