@@ -60,8 +60,14 @@ During development it will point to /styles/Awesome.css instead.
 **MUST** be named `__CSS__` if using the babel plugin, with a static value (not imported).
 A path can contain a glob but must be dot-delimited.
 
-`withCSS(__CSS__, scriptBlock: boolean = true)(Component);`
+
+withCSS(**\__CSS\__**, **scriptBlock**: boolean = true, **persist**: boolean = false)(**Component**);  
+
+
 If `scriptBlock` is false, then it won't inject empty script tags to work around Firefox Flash Of Unstyled Content
+  
+`persist` will keep those stylesheets in __CSS__ loaded in the document head even after the component unmounts
+
 
 ##### Server-side rendering
 **flushCSS()**  
